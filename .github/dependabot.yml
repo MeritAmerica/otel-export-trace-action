@@ -1,12 +1,14 @@
 version: 2
 updates:
-  - package-ecosystem: npm
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: weekly
-      time: "10:00"
-      timezone: America/Chicago
-    pull-request-branch-name:
-      separator: "-"
-    open-pull-requests-limit: 20
-    target-branch: "main"
+      interval: 'weekly'
+      day: 'tuesday'
+    labels:
+      - dependabot
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    reviewers:
+      - "MeritAmerica/eng-product"
