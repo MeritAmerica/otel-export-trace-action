@@ -11,11 +11,12 @@ jobs:
     name: OpenTelemetry Export Trace
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: export trace
         uses: ./
         with:
           otlpEndpoint: grpc://api.honeycomb.io:443/
-          otlpHeaders: ${{ secrets.DELIVERY_OTLP_HEADERS }}
+          otlpHeaders: ${{ secrets.HONEYCOMB_GITHUB_ACTIONS_WORKFLOW }}
+          otelServiceName: github-actions
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           runId: ${{ github.event.workflow_run.id }}

@@ -1,6 +1,11 @@
 # Open Telemetry Trace Exporter Action
 
-This action will export GitHub Workflow telemetry data using OTLP to a configurable endpoint.
+This is a fork of [inception health's otlp
+action](https://github.com/inception-health/otel-export-trace-action) that will
+export GitHub Workflow telemetry data using OTLP to a configurable endpoint.
+
+We forked this action to avoid github deprecations and to remove the junit trace
+exporter.
 
 ## Usage
 
@@ -20,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Export Workflow Trace
-        uses: inception-health/otel-export-trace-action@latest
+        uses: MeritAmerica/otel-export-trace-action@latest
         with:
           otlpEndpoint: grpc://api.honeycomb.io:443/
           otlpHeaders: ${{ secrets.OTLP_HEADERS }}
@@ -52,63 +57,6 @@ jobs:
           otlpEndpoint: grpc://api.honeycomb.io:443/
           otlpHeaders: ${{ secrets.OTLP_HEADERS }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### With Junit Tracing
-
-Combined with [OpenTelemetry Upload Trace Artifact](https://github.com/marketplace/actions/opentelemetry-upload-trace-artifact) this action will Download the OTLP Trace Log Artifact uploaded from the Workflow Run and export it.
-
-**pr-workflow.yml**
-
-```yaml
-name: "PR check"
-
-on:
-  pull_request:
-    branches: [main]
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-      - name: Install Dependencies
-        run: npm ci --ignore-scripts
-      - name: run tests
-        run: npm run test:ci
-      - uses: inception-health/otel-upload-test-artifact-action@v1
-        if: always()
-        with:
-          jobName: "build-and-test"
-          stepName: "run tests"
-          path: "junit.xml"
-          type: "junit"
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-```
-
-**otel-export-trace.yml**
-
-```yaml
-name: OpenTelemetry Export Trace
-
-on:
-  workflow_run:
-    workflows: ["PR check"]
-    types: [completed]
-
-jobs:
-  otel-export-trace:
-    name: OpenTelemetry Export Trace
-    runs-on: ubuntu-latest
-    steps:
-      - name: Export Workflow Trace
-        uses: inception-health/otel-export-trace-action@latest
-        with:
-          otlpEndpoint: grpc://api.honeycomb.io:443/
-          otlpHeaders: ${{ secrets.OTLP_HEADERS }}
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          runId: ${{ github.event.workflow_run.id }}
 ```
 
 ### Action Inputs
@@ -193,10 +141,3 @@ jobs:
 | github.job.step.number                  | integer | Github Step Run Number                                |
 | github.job.step.started_at              | string  | Github Step Run started_at                            |
 | github.job.step.completed_at            | string  | Github Step Run completed_at                          |
-
-## Honeycomb Example Trace
-
-![HoneyComb Example](./docs/honeycomb-example.png)
-
-_with JUnit traces_
-![HoneyComb Junit Example](./docs/honeycomb-junit-example.png)
