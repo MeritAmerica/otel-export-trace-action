@@ -8,8 +8,6 @@ on:
       - "package.json"
       - "action.yml"
       - ".github/workflows/build-main.yml"
-    branches:
-      - main
 
 jobs:
   lint-and-test:
